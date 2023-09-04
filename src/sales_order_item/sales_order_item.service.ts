@@ -56,15 +56,37 @@ export class SalesOrderItemService {
 
   async find(user:User):Promise<SalesOrderItem[]> {
     const items = await this.salesOrderItemRepository.find({where:{user:{id:user.id}}})
+    items.forEach(salesOrderItem=>{
+      delete salesOrderItem.user.id;
+      delete salesOrderItem.user.email;
+      delete salesOrderItem.user.createdAt;
+      delete salesOrderItem.user.updatedAt;
+      delete salesOrderItem.user.password;
+      delete salesOrderItem.salesOrder.user;
+      delete salesOrderItem.salesOrder.sales_order_id;
+      delete salesOrderItem.product.id;
+      delete salesOrderItem.product.createdAt;
+      delete salesOrderItem.product.updatedAt;
+    });
+
     return items;
   }
 
   async findOne(id: number,user:User) {
-    const item = await this.salesOrderItemRepository.findOne({where:{id:id,user:{id:user.id}}})
+    const salesOrderItem = await this.salesOrderItemRepository.findOne({where:{id:id,user:{id:user.id}}})
 
-    if (item) {
-      // console.log(tasks);
-      return item;
+    if (salesOrderItem) {
+      delete salesOrderItem.user.id;
+      delete salesOrderItem.user.email;
+      delete salesOrderItem.user.createdAt;
+      delete salesOrderItem.user.updatedAt;
+      delete salesOrderItem.user.password;
+      delete salesOrderItem.salesOrder.user;
+      delete salesOrderItem.salesOrder.sales_order_id;
+      delete salesOrderItem.product.id;
+      delete salesOrderItem.product.createdAt;
+      delete salesOrderItem.product.updatedAt;
+      return salesOrderItem;
     }
     else {
       throw new NotFoundException(`Cannot found! with the given id:${id}`);

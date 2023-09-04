@@ -3,15 +3,13 @@ import { CreateSalesOrderDto } from './dto/create-sales_order.dto';
 import { UpdateSalesOrderDto } from './dto/update-sales_order.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SalesOrder } from './entities/sales_order.entity';
-import { EntityManager, Not, Repository } from 'typeorm';
 import { User } from 'src/auth/user.entity';
-import { SalesOrderItem } from 'src/sales_order_item/entities/sales_order_item.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class SalesOrderService {
   constructor(@InjectRepository(SalesOrder)
-    private salesOrderRepository : Repository<SalesOrder>,
-    private entitiyManager : EntityManager){
+    private salesOrderRepository : Repository<SalesOrder>,){
 
     }
   async create(createSalesOrderDto: CreateSalesOrderDto,user:User) {
@@ -25,6 +23,14 @@ export class SalesOrderService {
 
   async find(user:User):Promise<SalesOrder[]> {
     const salesOrder = await this.salesOrderRepository.find({where:{user:{id:user.id}}})
+    salesOrder.forEach(salesOrder=>{
+      delete salesOrder.user.createdAt;
+      delete salesOrder.user.updatedAt;
+      delete salesOrder.user.id;
+      delete salesOrder.user.password;
+      delete salesOrder.user.email;     
+
+    })
     return salesOrder;
   }
 
@@ -33,6 +39,11 @@ export class SalesOrderService {
     if(!salesOrder){
       throw new NotFoundException(`The order is not found with id:${id}`)
     }
+    delete salesOrder.user.createdAt;
+    delete salesOrder.user.updatedAt;
+    delete salesOrder.user.id;
+    delete salesOrder.user.password;
+    delete salesOrder.user.email; 
     return salesOrder;
   }
 
