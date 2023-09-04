@@ -5,6 +5,7 @@ import { UpdateSalesOrderDto } from './dto/update-sales_order.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from 'src/auth/user.entity';
 import { GetUser } from 'src/auth/get-user.decorators';
+import { SalesOrder } from './entities/sales_order.entity';
 
 @Controller('sales-order')
 @UseGuards(AuthGuard())
@@ -17,13 +18,13 @@ export class SalesOrderController {
   }
 
   @Get()
-  async findAll(@GetUser() user:User) {
-    return await this.salesOrderService.findAll(user);
+  async find(@GetUser() user:User):Promise<SalesOrder[]> {
+    return await this.salesOrderService.find(user);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.salesOrderService.findOne(+id);
+  findOne(@Param('id') sales_order_id: number,@GetUser() user:User) {
+    return this.salesOrderService.findOne(sales_order_id,user);
   }
 
   @Patch(':id')
@@ -32,7 +33,7 @@ export class SalesOrderController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.salesOrderService.remove(+id);
+  remove(@Param('id') id: number, @GetUser() user:User) {
+    return this.salesOrderService.remove(id,user);
   }
 }

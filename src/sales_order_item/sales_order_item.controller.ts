@@ -5,6 +5,7 @@ import { UpdateSalesOrderItemDto } from './dto/update-sales_order_item.dto';
 import { GetUser } from 'src/auth/get-user.decorators';
 import { User } from 'src/auth/user.entity';
 import { AuthGuard } from '@nestjs/passport';
+import { SalesOrderItem } from './entities/sales_order_item.entity';
 
 @Controller('sales-order-item')
 @UseGuards(AuthGuard())
@@ -12,17 +13,17 @@ export class SalesOrderItemController {
   constructor(private readonly salesOrderItemService: SalesOrderItemService) {}
 
   @Post()
-  async create(@Body() createSalesOrderItemDto: CreateSalesOrderItemDto, @GetUser() user:User) {
+  async create(@Body() createSalesOrderItemDto: CreateSalesOrderItemDto, @GetUser() user:User){
     return await this.salesOrderItemService.create(createSalesOrderItemDto, user);
   }
 
   @Get()
-  async findAll(@GetUser() user:User) {
-    return await this.salesOrderItemService.findAll(user);
+  async find(@GetUser() user:User):Promise<SalesOrderItem[]>  {
+    return await this.salesOrderItemService.find(user);
   }
 
   @Get(':id')
-  async findOneItem(@Param('id') id: string, @GetUser() user:User ){
+  async findOneItem(@Param('id') id: number, @GetUser() user:User ){
     return await this.salesOrderItemService.findOne(id,user);
   }
 
@@ -32,7 +33,7 @@ export class SalesOrderItemController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.salesOrderItemService.remove(+id);
+  remove(@Param('id') id: number, user:User) {
+    return this.salesOrderItemService.remove(id,user);
   }
 }

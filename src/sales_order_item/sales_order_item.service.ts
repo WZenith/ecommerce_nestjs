@@ -54,18 +54,13 @@ export class SalesOrderItemService {
     
   }
 
-  async findAll(user:User) {
-    const query = this.salesOrderItemRepository.createQueryBuilder('items');
-    query.where({ user });
-    const items = await query.getMany();
-
+  async find(user:User):Promise<SalesOrderItem[]> {
+    const items = await this.salesOrderItemRepository.find({where:{user:{id:user.id}}})
     return items;
   }
 
-  async findOne(id: string,user:User) {
-    const query = this.salesOrderItemRepository.createQueryBuilder('item');
-    query.where({ id, user });
-    const item = await query.getOne()
+  async findOne(id: number,user:User) {
+    const item = await this.salesOrderItemRepository.findOne({where:{id:id,user:{id:user.id}}})
 
     if (item) {
       // console.log(tasks);
@@ -80,7 +75,13 @@ export class SalesOrderItemService {
     return `This action updates a #${id} salesOrderItem`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} salesOrderItem`;
+  async remove(id: number, user:User) {
+    const item = await this.findOne(id,user) ; 
+    if(!item){
+      throw new NotFoundException("Ordered item not found!");
+
+    }
+    return await this.salesOrderItemRepository.delete(id);
+
   }
 }

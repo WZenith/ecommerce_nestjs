@@ -83,7 +83,7 @@ export class UserRepository {
             throw new NotFoundException(`User not found with id:${id}`);
         }
         else {
-            await this.userRepository.delete({ id });
+            await this.userRepository.delete(id);
             return "Successfully Deleted!"
         }
     }
