@@ -33,7 +33,7 @@ export class SalesOrderItemController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: number, user:User) {
+  remove(@Param('id') id: number,@GetUser() user:User) {
     return this.salesOrderItemService.remove(id,user);
   }
 }

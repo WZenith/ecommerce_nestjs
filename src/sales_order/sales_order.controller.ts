@@ -33,7 +33,7 @@ export class SalesOrderController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: number, @GetUser() user:User) {
-    return this.salesOrderService.remove(id,user);
+  async remove(@Param('id') id: number, @GetUser() user:User) {
+    return await this.salesOrderService.remove(id,user);
   }
 }

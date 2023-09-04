@@ -77,11 +77,8 @@ export class SalesOrderItemService {
 
   async remove(id: number, user:User) {
     const item = await this.findOne(id,user) ; 
-    if(!item){
-      throw new NotFoundException("Ordered item not found!");
-
-    }
-    return await this.salesOrderItemRepository.delete(id);
+    await this.salesOrderItemRepository.delete(item);
+    return "Successfully Deleted !"
 
   }
 }
