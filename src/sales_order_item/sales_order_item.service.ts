@@ -49,7 +49,7 @@ export class SalesOrderItemService {
       await this.salesOrderRepository.save(salesOrder);
     }
 
-    return salesOrderItems;
+    return "Successfully ordered!";
     
   }
 
