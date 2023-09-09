@@ -70,6 +70,8 @@ export class SalesOrderItemService {
     return salesOrder;
   }
 
+
+
   async find(user:User):Promise<SalesOrderItem[]> {
     const items = await this.salesOrderItemRepository.find({where:{user:{id:user.id}}});
     items.forEach(salesOrderItem=>{
@@ -86,13 +88,7 @@ export class SalesOrderItemService {
     const salesOrderItem = await this.salesOrderItemRepository.findOne({where:{id:id,user:{id:user.id}}})
 
     if (salesOrderItem) {
-      delete salesOrderItem.user.id;
-      delete salesOrderItem.user.email;
-      delete salesOrderItem.user.createdAt;
-      delete salesOrderItem.user.updatedAt;
-      delete salesOrderItem.user.password;
-      delete salesOrderItem.salesOrder.user;
-      delete salesOrderItem.salesOrder.sales_order_id;
+      delete salesOrderItem.user;
       delete salesOrderItem.product.id;
       delete salesOrderItem.product.createdAt;
       delete salesOrderItem.product.updatedAt;

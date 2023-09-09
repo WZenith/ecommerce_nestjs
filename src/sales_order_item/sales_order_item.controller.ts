@@ -20,7 +20,7 @@ export class SalesOrderItemController {
   }
 
   @Get()
-  async findSalesOrderItem(@GetUser() user:User)  {
+  async findSalesOrder(@GetUser() user:User)  {
     return await this.salesOrderItemService.findSalesOrder(user);
   }
 
@@ -29,17 +29,17 @@ export class SalesOrderItemController {
     return await this.salesOrderItemService.find(user);
   }
 
-  @Get('sales-order-item:id')
+  @Get('sales-order-item/:id')
   async findOneItem(@Param('id') id: number, @GetUser() user:User ){
     return await this.salesOrderItemService.findOne(id,user);
   }
 
-  @Patch('sales-order-item:id')
+  @Patch('sales-order-item/:id')
   update(@Param('id') id: string, @Body() updateSalesOrderItemDto: UpdateSalesOrderItemDto) {
     return this.salesOrderItemService.update(+id, updateSalesOrderItemDto);
   }
 
-  @Delete('sales-order-item:id')
+  @Delete('sales-order-item/:id')
   remove(@Param('id') id: number,@GetUser() user:User) {
     return this.salesOrderItemService.remove(id,user);
   }
