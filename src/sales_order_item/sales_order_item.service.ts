@@ -1,12 +1,14 @@
 import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
-import { CreateSalesOrderItemDto } from './dto/create-sales_order_item.dto';
 import { UpdateSalesOrderItemDto } from './dto/update-sales_order_item.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SalesOrderItem } from './entities/sales_order_item.entity';
-import { EntityManager, Repository } from 'typeorm';
+import { EntityManager, NoConnectionForRepositoryError, Not, Repository } from 'typeorm';
 import { Product } from 'src/products/entities/product.entity';
-import { SalesOrder } from 'src/sales_order/entities/sales_order.entity';
+
 import { User } from 'src/auth/user.entity';
+import { SalesOrder } from './entities/sales_order.entity';
+import { CreateSalesOrderDto } from './dto/create-sales-order.dto';
+
 
 @Injectable()
 export class SalesOrderItemService {
@@ -17,56 +19,64 @@ export class SalesOrderItemService {
   
   @InjectRepository(SalesOrder)
   private salesOrderRepository: Repository<SalesOrder>,
-  
-  private entityManager: EntityManager){
+
+  private entityManager: EntityManager,
+  ){
     
   }
-  async create(createSalesOrderItemDto: CreateSalesOrderItemDto,user:User) {
-    const {salesOrderId, productId, quantity} = createSalesOrderItemDto;
-    const id = productId;
-    const foundProduct = await this.productRepository.findOneBy({id});
-    const sales_order_id = salesOrderId;
-    const salesOrder = await this.salesOrderRepository.findOne({where:{sales_order_id}});
+  async create(createSalesOrderDto: CreateSalesOrderDto,user:User) {
+    const salesOrder = this.salesOrderRepository.create({user});
+    salesOrder.grand_Total = 0;
+    await this.salesOrderRepository.save(salesOrder);
+    // Create an array to hold the order items
+    const salesOrderItems = createSalesOrderDto.ordered_Items;     
 
-    const product = foundProduct;
-    if(!foundProduct){
-      throw new NotFoundException('Product not available in the store!');
+    // Loop through the array of item DTOs and create order items
+    for(let i= 0;i<salesOrderItems.length;i++){
+      var id  = salesOrderItems[i].productId;
+      var product = await this.productRepository.findOneBy({id});
+      var quantity = salesOrderItems[i].quantity;
+      var amount = quantity * product.price_in_rupees;
+      var salesOrderItem = this.salesOrderItemRepository.create({
+        salesOrder,
+        product,
+        quantity,
+        amount,
+        user
+      });
+      salesOrder.grand_Total=salesOrder.grand_Total+amount;
+      await this.salesOrderItemRepository.save(salesOrderItem);      
+      await this.salesOrderRepository.save(salesOrder);
     }
-    if(!salesOrder){
-      throw new NotFoundException( `Sales Order not found with the id:${sales_order_id}`)
-    }
-    const amount = foundProduct.price_in_rupees*quantity;
-    const salesOrderItem = await this.salesOrderItemRepository.create({
-      salesOrder,
-      product,
-      quantity,
-      amount,
-      user
+
+    return salesOrderItems;
+    
+  }
+
+  async findSalesOrder(user:User){
+    const salesOrder = await this.salesOrderRepository.find({where:{user:{id:user.id}}});
+    salesOrder.forEach(salesOrder=>{
+      delete salesOrder.user;
+      salesOrder.salesOrderItem.forEach(item=>{
+      
+        delete item.user;
+        delete item.salesOrder;
+        delete item.product.createdAt;
+        delete item.product.updatedAt;
+        delete item.product.id;
+
+      })
     })
-    
-    try {
-      await this.entityManager.save(salesOrderItem);
-  } catch (error) {
-      throw new InternalServerErrorException();
-  }
-
-  return salesOrderItem;
-    
+    return salesOrder;
   }
 
   async find(user:User):Promise<SalesOrderItem[]> {
-    const items = await this.salesOrderItemRepository.find({where:{user:{id:user.id}}})
+    const items = await this.salesOrderItemRepository.find({where:{user:{id:user.id}}});
     items.forEach(salesOrderItem=>{
-      delete salesOrderItem.user.id;
-      delete salesOrderItem.user.email;
-      delete salesOrderItem.user.createdAt;
-      delete salesOrderItem.user.updatedAt;
-      delete salesOrderItem.user.password;
-      delete salesOrderItem.salesOrder.user;
-      delete salesOrderItem.salesOrder.sales_order_id;
+      delete salesOrderItem.user;
       delete salesOrderItem.product.id;
-      delete salesOrderItem.product.createdAt;
       delete salesOrderItem.product.updatedAt;
+      delete salesOrderItem.product.createdAt;
     });
 
     return items;

@@ -15,16 +15,21 @@ export class ProductsService {
   }
 
   async create(createProductDto: CreateProductDto) {
-    try{
-      return await this.productRepository.save(createProductDto);
-    }catch(error){
-      if(error){
-        throw new ConflictException("Product name already exists!");
+    const products = createProductDto.products;
+
+    for(let i=0;i<products.length;i++){
+      const product_name = products[i].product_name;
+      const product = await this.productRepository.findOneBy({product_name});
+      if(!product){
+        await this.productRepository.save(products[i]);
       }
       else{
-        throw new InternalServerErrorException();
+        throw new ConflictException(`Product already added with name ${product_name}!`);
       }
-    }
+      
+    }    
+    return "Successfully added products!"
+   
   }
 
   async findAll() {

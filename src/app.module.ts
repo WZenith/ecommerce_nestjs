@@ -1,13 +1,12 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProductsModule } from './products/products.module';
-import { SalesOrderModule } from './sales_order/sales_order.module';
 import { AuthModule } from './auth/auth.module';
 import { User } from './auth/user.entity';
 import { Product } from './products/entities/product.entity';
-import { SalesOrder } from './sales_order/entities/sales_order.entity';
 import { SalesOrderItem } from './sales_order_item/entities/sales_order_item.entity';
 import { SalesOrderItemModule } from './sales_order_item/sales_order_item.module';
+import { SalesOrder } from './sales_order_item/entities/sales_order.entity';
 
 @Module({
   imports: [
@@ -25,7 +24,6 @@ import { SalesOrderItemModule } from './sales_order_item/sales_order_item.module
     }),
     AuthModule,
     ProductsModule,
-    SalesOrderModule,
     SalesOrderItemModule,
 
   ],

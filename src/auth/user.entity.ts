@@ -1,7 +1,8 @@
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { UserStatus } from "./user-status.enum";
-import { SalesOrder } from "src/sales_order/entities/sales_order.entity";
+
 import { SalesOrderItem } from "src/sales_order_item/entities/sales_order_item.entity";
+import { SalesOrder } from "src/sales_order_item/entities/sales_order.entity";
 
 @Entity('user')
 export class User{

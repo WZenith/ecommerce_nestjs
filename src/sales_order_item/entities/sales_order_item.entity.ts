@@ -1,8 +1,9 @@
 import { Exclude } from "class-transformer";
 import { User } from "src/auth/user.entity";
 import { Product } from "src/products/entities/product.entity";
-import { SalesOrder } from "src/sales_order/entities/sales_order.entity";
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+
+import { Column, Entity, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { SalesOrder } from "./sales_order.entity";
 
 @Entity('sales_order_item')
 export class SalesOrderItem {
@@ -10,7 +11,7 @@ export class SalesOrderItem {
     @PrimaryGeneratedColumn()
     id:number;
 
-    @ManyToOne(()=>SalesOrder, salesOrder=>salesOrder.salesOrderItem,{lazy:false,eager:true})
+    @ManyToOne(()=>SalesOrder, salesOrder=>salesOrder.salesOrderItem,{eager:false})
     @Exclude({ toPlainOnly: true, toClassOnly: false })
     salesOrder: SalesOrder;
 
