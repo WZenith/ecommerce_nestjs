@@ -104,8 +104,8 @@ export class SalesOrderItemService {
   }
 
   async remove(id: number, user:User) {
-    const item = await this.findOne(id,user) ; 
-    await this.salesOrderItemRepository.delete(item);
+    await this.findOne(id,user) ;
+    await this.salesOrderItemRepository.delete({id,user});
     return "Successfully Deleted !"
 
   }
