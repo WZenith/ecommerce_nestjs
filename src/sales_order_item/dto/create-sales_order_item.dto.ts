@@ -1,4 +1,4 @@
-import { IsNotEmpty } from "class-validator";
+import { IsNotEmpty, Min } from "class-validator";
 export class CreateSalesOrderItemDto {
     // @IsNotEmpty()
     // salesOrderId:number;
@@ -7,5 +7,6 @@ export class CreateSalesOrderItemDto {
     productId:number;
 
     @IsNotEmpty()
+    @Min(1, { message: 'Quantity must be greater than 0' })
     quantity:number;
 }

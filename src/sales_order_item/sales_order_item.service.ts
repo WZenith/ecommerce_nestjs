@@ -1,8 +1,8 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { UpdateSalesOrderItemDto } from './dto/update-sales_order_item.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SalesOrderItem } from './entities/sales_order_item.entity';
-import { EntityManager, NoConnectionForRepositoryError, Not, Repository } from 'typeorm';
+import { EntityManager,Repository } from 'typeorm';
 import { Product } from 'src/products/entities/product.entity';
 
 import { User } from 'src/auth/user.entity';
@@ -70,8 +70,6 @@ export class SalesOrderItemService {
     return salesOrder;
   }
 
-
-
   async find(user:User):Promise<SalesOrderItem[]> {
     const items = await this.salesOrderItemRepository.find({where:{user:{id:user.id}}});
     items.forEach(salesOrderItem=>{
@@ -99,8 +97,19 @@ export class SalesOrderItemService {
     }
   }
 
-  update(id: number, updateSalesOrderItemDto: UpdateSalesOrderItemDto) {
-    return `This action updates a #${id} salesOrderItem`;
+  async update(id: number, updateSalesOrderItemDto: UpdateSalesOrderItemDto,user:User) {
+    const salesOrderItem = await this.findOne(id,user);
+    const {productId,quantity} = updateSalesOrderItemDto;
+    const product =  await this.productRepository.findOneBy({id});
+    salesOrderItem.product = product;
+    salesOrderItem.quantity = quantity;
+    salesOrderItem.amount = quantity*product.price_in_rupees;
+    await this.entityManager.save(salesOrderItem);
+    delete salesOrderItem.product.id;
+    delete salesOrderItem.product.createdAt;
+    delete salesOrderItem.product.updatedAt;
+    return salesOrderItem;
+    
   }
 
   async remove(id: number, user:User) {

@@ -35,8 +35,8 @@ export class SalesOrderItemController {
   }
 
   @Patch('sales-order-item/:id')
-  update(@Param('id') id: string, @Body() updateSalesOrderItemDto: UpdateSalesOrderItemDto) {
-    return this.salesOrderItemService.update(+id, updateSalesOrderItemDto);
+  update(@Param('id') id: number, @Body() updateSalesOrderItemDto: UpdateSalesOrderItemDto,@GetUser() user:User) {
+    return this.salesOrderItemService.update(id, updateSalesOrderItemDto,user);
   }
 
   @Delete('sales-order-item/:id')
